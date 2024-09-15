@@ -9,62 +9,10 @@ class SudokuGrid {
         private val charsInv = chars.map { it.value to it.key }.toMap()
     }
     private val grid: Array<Array<SudokuCell>>
-    private val intGrid: Array<IntArray>
-        get() = grid.map { rows -> IntArray(rows.size) { rows[it].value } }.toTypedArray()
+//    private val intGrid: Array<IntArray>
+//        get() = grid.map { rows -> IntArray(rows.size) { rows[it].value } }.toTypedArray()
 //    val subSize: Int
 //        get() = sqrt(grid.size.toDouble()).toInt()
-
-    constructor(stringGrid: String) {
-        val intGrid = stringGrid.replace(Regex("[ \t\r]"), "")
-            .replace(Regex("\n+"), "\n")
-            .trim().split('\n')
-            .map { it.toCharArray().map { char -> chars[char]!! }.toIntArray() }
-            .toTypedArray()
-
-        val grid = Array(intGrid.size) { Array(intGrid[0].size) { SudokuCell() } }
-        for (i in intGrid.indices) {
-            for (j in intGrid[i].indices) {
-                val value = intGrid[i][j]
-                grid[i][j] = SudokuCell(value, if (value == 0) getCandidates(intGrid, i, j) else setOf())
-            }
-        }
-        this.grid = grid
-    }
-    constructor(intGrid: Array<IntArray>) {
-        val grid = Array(intGrid.size) { Array(intGrid[0].size) { SudokuCell() } }
-        for (i in intGrid.indices) {
-            for (j in intGrid[i].indices) {
-                val value = intGrid[i][j]
-                grid[i][j] = SudokuCell(value, if (value == 0) getCandidates(intGrid, i, j) else setOf())
-            }
-        }
-        this.grid = grid
-    }
-
-//    fun getCandidates(r: Int, c: Int): Set<Int> = getCandidates(intGrid, r, c)
-    private fun getCandidates(grid: Array<IntArray>, r: Int, c: Int): Set<Int> {
-        val candidates = sortedSetOf<Int>()
-        for (num in 1 .. grid.size) {
-            if (isValid(grid, r, c, num)) {
-                candidates.add(num)
-            }
-        }
-        return candidates
-    }
-
-    // Function to check if a number is safe to place in the Sudoku grid
-//    fun isValid(r: Int, c: Int, value: Int): Boolean = isValid(intGrid, r, c, value)
-    private fun isValid(grid: Array<IntArray>, r: Int, c: Int, value: Int): Boolean {
-        // Check the row, column and subgrid
-        val subSize = sqrt(grid.size.toDouble()).toInt()
-        val subRow = (r / subSize) * subSize
-        val subCol = (c / subSize) * subSize
-        for (i in grid.indices) {
-            if (grid[r][i] == value || grid[i][c] == value || grid[subRow + i / subSize][subCol + i % subSize] == value)
-                return false
-        }
-        return true
-    }
 
     private fun toGridString(): String = buildString {
         for (rows in grid) {
@@ -91,4 +39,48 @@ class SudokuGrid {
             append(toSubGridString())
         }
     }
+
+    constructor(intGrid: Array<IntArray>) {
+        val grid = Array(intGrid.size) { Array(intGrid[0].size) { SudokuCell() } }
+        for (i in intGrid.indices) {
+            for (j in intGrid[i].indices) {
+                val value = intGrid[i][j]
+                grid[i][j] = SudokuCell(value, if (value == 0) getCandidates(intGrid, i, j) else setOf())
+            }
+        }
+        this.grid = grid
+    }
+    constructor(stringGrid: String): this(stringGrid.replace(Regex("[ \t\r]"), "")
+        .replace(Regex("\n+"), "\n").trim().split('\n')
+        .map { it.toCharArray().map { char -> chars[char]!! }.toIntArray() }.toTypedArray())
+
+//    fun getCandidates(r: Int, c: Int): Set<Int> = getCandidates(intGrid, r, c)
+    private fun getCandidates(grid: Array<IntArray>, r: Int, c: Int): Set<Int> {
+        val candidates = sortedSetOf<Int>()
+        for (num in 1 .. grid.size) {
+            if (isValid(grid, r, c, num)) {
+                candidates.add(num)
+            }
+        }
+        return candidates
+    }
+
+    // Function to check if a number is safe to place in the Sudoku grid
+//    fun isValid(r: Int, c: Int, value: Int): Boolean = isValid(intGrid, r, c, value)
+    private fun isValid(grid: Array<IntArray>, r: Int, c: Int, value: Int): Boolean {
+        // Check the row, column and subgrid
+        val subSize = sqrt(grid.size.toDouble()).toInt()
+        val subRow = (r / subSize) * subSize
+        val subCol = (c / subSize) * subSize
+        for (i in grid.indices) {
+            val subR = subRow + i / subSize
+            val subC = subCol + i % subSize
+            if (grid[r][i] == value || grid[i][c] == value || grid[subR][subC] == value)
+                return false
+        }
+        return true
+    }
+
+
+
 }
