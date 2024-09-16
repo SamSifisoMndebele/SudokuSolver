@@ -162,6 +162,6 @@ fun main() {
     5	8	7	6	4	1	9	3	2*/
 
     executionTime {
-        solveSudoku(hardest)
+        solveSudoku(easiest)
     }
 }
