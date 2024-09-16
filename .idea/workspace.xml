@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e8a2484f-5303-49af-805b-c9712e234dcc" name="Changes" comment="1.1.0">
-      <change afterPath="$PROJECT_DIR$/src/Utils.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/sudoku/Sudoku.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Sudoku.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Sudoku.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +26,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
@@ -40,9 +46,10 @@
   "keyToString": {
     "Kotlin.MainKt.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "E:/IdeaProjects/SudokuSolver/src/sudoku",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -51,6 +58,12 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\IdeaProjects\SudokuSolver\src\sudoku" />
+      <recent name="E:\IdeaProjects\SudokuSolver\src" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="MainKt" />
@@ -82,7 +95,7 @@
       <option name="presentableId" value="Default" />
       <updated>1726397246458</updated>
       <workItem from="1726397247568" duration="220000" />
-      <workItem from="1726397477695" duration="51715000" />
+      <workItem from="1726397477695" duration="62115000" />
     </task>
     <task id="LOCAL-00001" summary="Init the grid with heuristic values.">
       <option name="closed" value="true" />
@@ -116,7 +129,23 @@
       <option name="project" value="LOCAL" />
       <updated>1726504723156</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="1.1.0">
+      <option name="closed" value="true" />
+      <created>1726506312279</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1726506312279</updated>
+    </task>
+    <task id="LOCAL-00006" summary="1.1.0">
+      <option name="closed" value="true" />
+      <created>1726506368419</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1726506368419</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -1,3 +1,6 @@
+package sudoku
+
+/*
 import kotlin.math.sqrt
 
 private val numbers = mapOf('A' to 10, 'B' to 11, 'C' to 12, 'D' to 13, 'E' to 14, 'F' to 15, 'G' to 16, 'H' to 17, 'I' to 18, 'J' to 19, 'K' to 20,
@@ -8,6 +11,9 @@ private fun String.toIntGrid(): Array<out IntArray> = replace(Regex("[ \t\r]"), 
     .split('\n')
     .map { it.toCharArray().map { char -> if (char.isDigit()) char.digitToInt() else numbers[char]!! }.toIntArray() }
     .toTypedArray()
+private fun String.toCellGrid(): Array<out Array<Cell>> = toIntGrid().let {
+    Array(it.size) { r -> Array(it[0].size) { c -> Cell(it, r, c)} }
+}
 private fun Array<out IntArray>.toStringGrid(): String {
     val letters = numbers.map { it.value to it.key }.toMap()
     val buffer = StringBuilder()
@@ -20,6 +26,19 @@ private fun Array<out IntArray>.toStringGrid(): String {
     }
     return buffer.toString()
 }
+private fun Array<out Array<Cell>>.toStringGrid(): String {
+    val letters = numbers.map { it.value to it.key }.toMap()
+    val buffer = StringBuilder()
+    for ((i, rows) in this.withIndex()) {
+        if (i > 0) buffer.append('\n')
+        for ((j, element) in rows.withIndex()) {
+            if (j > 0) buffer.append("\t")
+            if (element.value < 10) buffer.append(element.value) else buffer.append(letters[element.value])
+        }
+    }
+    return buffer.toString()
+}
+private fun Array<out Array<Cell>>.toIntGrid(): Array<out IntArray> = map { row -> row.map { it.value }.toIntArray() }.toTypedArray()
 
 private fun isValid(intGrid: Array<out IntArray>, r: Int, c: Int, value: Int): Boolean {
     // Check the row, column and subgrid
@@ -46,49 +65,59 @@ private fun getCandidates(intGrid: Array<out IntArray>, r: Int, c: Int): Set<Int
     }
     return candidates
 }
-data class Position(
-    val row: Int = -1,
-    val col: Int = -1,
-    val candidates: Set<Int> = emptySet()
-)
-private fun nextPosition(grid: Array<out IntArray>): Position {
-    var position = Position()
-    var minCandidates = 100
-    val f = grid.flatMap { it.toList() }.toIntArray()
-    java.util.Arrays.parallelSort(f)
 
-    for (r in grid.indices) {
-        for (c in grid[r].indices) {
-            if (grid[r][c] == 0) {
-                val candidates = getCandidates(grid, r, c)
-                if (candidates.size < minCandidates) {
-                    minCandidates = candidates.size
-                    position = Position(r, c, candidates)
-                }
-            }
-        }
+private class Cell {
+    val value: Int
+    val candidates: Set<Int>
+    val row: Int
+    val col: Int
+    val heuristic get() = candidates.size
+
+    constructor(intGrid: Array<out IntArray>, row: Int, col: Int) {
+        this.value = intGrid[row][col]
+        this.candidates = getCandidates(intGrid, row, col)
+        this.row = row
+        this.col = col
     }
-    return position
+    constructor(grid: Array<out Array<Cell>>, row: Int, col: Int) {
+        val cell = grid[row][col]
+        this.value = cell.value
+        this.candidates = cell.candidates
+        this.row = row
+        this.col = col
+    }
+
+    override fun toString(): String = value.toString()
 }
-private fun solve(intGrid: Array<out IntArray>): Array<out IntArray>? {
-    val pos = nextPosition(intGrid)
-    if (pos == Position()) { return intGrid }  // All cells filled
 
-    for (candidate in pos.candidates) {
-        intGrid[pos.row][pos.col] = candidate
-        val solution = solve(intGrid)
-        if (solution != null) return solution
-        intGrid[pos.row][pos.col] = 0 // Backtrack if the candidate doesn't lead to a solution
-    }
+private fun solve(cellGrid: Array<out Array<Cell>>): Array<out Array<Cell>>? {
+//    val grid = Array(cellGrid.size) { row -> Array(cellGrid[0].size) { col -> Cell(cellGrid, row, col) } }
+//    val cell = grid.flatten().filter { it.heuristic != 0 }.minByOrNull { it.heuristic }
+//
+//    if (cell == null && grid.all { it -> it.all { it.value != 0 } }) return intGrid // All cells filled
+//    else if (cell == null) return null
+//
+//    for (candidate in cell.candidates) {
+//        intGrid[cell.row][cell.col] = candidate
+//        val solution = solve(intGrid)
+//        if (solution != null) return solution
+//        intGrid[cell.row][cell.col] = 0 // Backtracking
+//    }
     return null // No solution found for this configuration
 }
 
+*/
 /**
  * Solves a Sudoku grid
  * @param stringGrid grid of number characters from `1` to `9` then `A` to `P` (for numbers from 10 to 25)
- */
+ * @sample `1 0 0 0
+ * 0 0 2 0
+ * 0 3 0 0
+ * 0 0 0 4`
+ *//*
+
 fun solveSudoku(stringGrid: String) {
-    val grid = stringGrid.toIntGrid()
+    val grid = stringGrid.toCellGrid()
     println("Problem:")
     println(grid.toStringGrid())
 
@@ -98,4 +127,4 @@ fun solveSudoku(stringGrid: String) {
         println(solution.toStringGrid())
     }
     else println("No solution")
-}
+}*/
