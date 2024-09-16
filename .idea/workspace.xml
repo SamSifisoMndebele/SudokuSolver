@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a2484f-5303-49af-805b-c9712e234dcc" name="Changes" comment="Init the grid with heuristic values.">
-      <change afterPath="$PROJECT_DIR$/src/Sudoku.kt" afterDir="false" />
+    <list default="true" id="e8a2484f-5303-49af-805b-c9712e234dcc" name="Changes" comment="1.0.2">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SudokuCell.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/SudokuCell.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SudokuGrid.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Sudoku.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Sudoku.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +82,7 @@
       <option name="presentableId" value="Default" />
       <updated>1726397246458</updated>
       <workItem from="1726397247568" duration="220000" />
-      <workItem from="1726397477695" duration="36429000" />
+      <workItem from="1726397477695" duration="49901000" />
     </task>
     <task id="LOCAL-00001" summary="Init the grid with heuristic values.">
       <option name="closed" value="true" />
@@ -102,7 +100,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726414056100</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="1.0.2">
+      <option name="closed" value="true" />
+      <created>1726470929949</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1726470929949</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -112,6 +118,7 @@
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="Init the grid with heuristic values." />
-    <option name="LAST_COMMIT_MESSAGE" value="Init the grid with heuristic values." />
+    <MESSAGE value="1.0.2" />
+    <option name="LAST_COMMIT_MESSAGE" value="1.0.2" />
   </component>
 </project>
