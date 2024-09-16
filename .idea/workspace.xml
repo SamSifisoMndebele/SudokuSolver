@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a2484f-5303-49af-805b-c9712e234dcc" name="Changes" comment="1.1.0">
-      <change afterPath="$PROJECT_DIR$/src/sudoku/Sudoku.kt" afterDir="false" />
+    <list default="true" id="e8a2484f-5303-49af-805b-c9712e234dcc" name="Changes" comment="2.0">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Sudoku.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Sudoku.kt" afterDir="false" />
@@ -95,7 +94,7 @@
       <option name="presentableId" value="Default" />
       <updated>1726397246458</updated>
       <workItem from="1726397247568" duration="220000" />
-      <workItem from="1726397477695" duration="62115000" />
+      <workItem from="1726397477695" duration="67526000" />
     </task>
     <task id="LOCAL-00001" summary="Init the grid with heuristic values.">
       <option name="closed" value="true" />
@@ -145,7 +144,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726506368419</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="2.0">
+      <option name="closed" value="true" />
+      <created>1726524557101</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1726524557101</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -157,6 +164,7 @@
     <MESSAGE value="Init the grid with heuristic values." />
     <MESSAGE value="1.0.2" />
     <MESSAGE value="1.1.0" />
-    <option name="LAST_COMMIT_MESSAGE" value="1.1.0" />
+    <MESSAGE value="2.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="2.0" />
   </component>
 </project>
