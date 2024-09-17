@@ -1,4 +1,6 @@
+import java.util.TreeSet
 import java.util.stream.IntStream
+import kotlin.concurrent.thread
 import kotlin.math.sqrt
 
 
@@ -38,23 +40,23 @@ private fun isValid(grid: Array<out IntArray>, r: Int, c: Int, value: Int): Bool
 }
 
 private fun getCandidates(grid: Array<out IntArray>, r: Int, c: Int): Set<Int> {
-    val candidates = mutableSetOf<Int>()
+    val candidates = LinkedHashSet<Int>()
     for (num in 1 .. grid.size) {
         if (isValid(grid, r, c, num)) {
             candidates.add(num)
         }
     }
-    return candidates
+    return candidates.toSortedSet()
 }
 private fun getCandidatesParallel(grid: Array<out IntArray>, r: Int, c: Int): Set<Int> {
-    val candidates = mutableSetOf<Int>()
+    val candidates = LinkedHashSet<Int>()
     IntStream.range(1, grid.size + 1).parallel()
         .forEach { num ->
             if (isValid(grid, r, c, num)) {
                 candidates.add(num)
             }
         }
-    return candidates
+    return candidates.toSortedSet()
 }
 
 data class Position(
@@ -66,12 +68,13 @@ private fun nextPosition(grid: Array<out IntArray>): Position {
     var position = Position()
     var minCandidates = 100
     for (r in grid.indices) {
-        for (c in grid[r].indices) {
+        for (c in grid.indices) {
             if (grid[r][c] == 0) {
                 val candidates = getCandidates(grid, r, c)
                 if (candidates.size < minCandidates) {
                     minCandidates = candidates.size
                     position = Position(r, c, candidates)
+                    if (minCandidates == 1) return position
                 }
             }
         }
@@ -115,6 +118,9 @@ private fun solveParallel(grid: Array<out IntArray>): Array<out IntArray>? {
 
     for (candidate in pos.candidates) {
         grid[pos.row][pos.col] = candidate
+//        println()
+//        println(candidate)
+//        println(grid.toStringGrid())
         val solution = solveParallel(grid)
         if (solution != null) return solution
         grid[pos.row][pos.col] = 0 // Backtrack if the candidate doesn't lead to a solution
