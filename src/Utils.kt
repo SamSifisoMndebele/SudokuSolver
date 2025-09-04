@@ -1,15 +1,21 @@
-import java.time.Instant
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
-fun executionTime(executable: () -> Unit) {
-    val thread = Thread {
-        val start = Instant.now()
-        // call the method you want to measure the execution time of here
-        executable()
-        val end = Instant.now()
 
-        val executionTime = end.toEpochMilli() - start.toEpochMilli()
-        println("\nExecution time:\t\t$executionTime ms")
-        println("--------------------------------------")
+@OptIn(ExperimentalContracts::class)
+inline infix fun <T,R> T.withTimeMillis(block: T.() -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    thread.start()
+    val start = System.currentTimeMillis()
+    val result = block()
+    val time = System.currentTimeMillis() - start
+    println("Execution time: ${time}ms")
+    println("--------------------------------------")
+    return result
+}
+
+inline fun <R> withTimeMillis(block: () -> R): R = Unit.withTimeMillis {
+    block()
 }

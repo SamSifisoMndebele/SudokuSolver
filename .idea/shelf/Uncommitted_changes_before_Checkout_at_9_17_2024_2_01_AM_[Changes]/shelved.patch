@@ -1,0 +1,140 @@
+Index: src/Sudoku.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import kotlin.math.sqrt\r\n\r\nprivate val numbers = mapOf('A' to 10, 'B' to 11, 'C' to 12, 'D' to 13, 'E' to 14, 'F' to 15, 'G' to 16, 'H' to 17, 'I' to 18, 'J' to 19, 'K' to 20,\r\n    'L' to 21, 'M' to 22, 'N' to 23, 'O' to 24, 'P' to 25, 'Q' to 26, 'R' to 27, 'S' to 28, 'T' to 29, 'U' to 30, 'V' to 31, 'W' to 32, 'X' to 34, 'Y' to 35, 'Z' to 36)\r\n\r\nprivate fun String.toIntGrid(): Array<out IntArray> = replace(Regex(\"[ \\t\\r]\"), \"\")\r\n    .replace(Regex(\"\\n+\"), \"\\n\").trim()\r\n    .split('\\n')\r\n    .map { it.toCharArray().map { char -> if (char.isDigit()) char.digitToInt() else numbers[char]!! }.toIntArray() }\r\n    .toTypedArray()\r\nprivate fun Array<out IntArray>.toStringGrid(): String {\r\n    val letters = numbers.map { it.value to it.key }.toMap()\r\n    val buffer = StringBuilder()\r\n    for ((i, rows) in this.withIndex()) {\r\n        if (i > 0) buffer.append('\\n')\r\n        for ((j, element) in rows.withIndex()) {\r\n            if (j > 0) buffer.append(\"\\t\")\r\n            if (element < 10) buffer.append(element) else buffer.append(letters[element])\r\n        }\r\n    }\r\n    return buffer.toString()\r\n}\r\n\r\nprivate fun isValid(intGrid: Array<out IntArray>, r: Int, c: Int, value: Int): Boolean {\r\n    // Check the row, column and subgrid\r\n    val subSize = sqrt(intGrid.size.toDouble()).toInt()\r\n    val subRow = (r / subSize) * subSize\r\n    val subCol = (c / subSize) * subSize\r\n    for (i in intGrid.indices) {\r\n        val subR = subRow + i / subSize\r\n        val subC = subCol + i % subSize\r\n        if (intGrid[r][i] == value || intGrid[i][c] == value || intGrid[subR][subC] == value)\r\n            return false\r\n    }\r\n    return true\r\n}\r\nprivate fun getCandidates(intGrid: Array<out IntArray>, r: Int, c: Int): Set<Int> {\r\n    val value = intGrid[r][c]\r\n    if (value != 0) return emptySet()\r\n\r\n    val candidates = sortedSetOf<Int>()\r\n    for (num in 1 .. intGrid.size) {\r\n        if (isValid(intGrid, r, c, num)) {\r\n            candidates.add(num)\r\n        }\r\n    }\r\n    return candidates\r\n}\r\n\r\nprivate class Cell(intGrid: Array<out IntArray>, val row: Int, val col: Int) {\r\n    val value = intGrid[row][col]\r\n    val candidates = getCandidates(intGrid, row, col)\r\n    val heuristic get() = candidates.size\r\n\r\n    override fun toString(): String = value.toString()\r\n}\r\n\r\nprivate fun solve(intGrid: Array<out IntArray>): Array<out IntArray>? {\r\n    val grid = Array(intGrid.size) { row -> Array(intGrid[0].size) { col -> Cell(intGrid, row, col) } }\r\n    val cell = grid.flatten().filter { it.heuristic != 0 }.minByOrNull { it.heuristic }\r\n\r\n    if (cell == null && grid.all { it -> it.all { it.value != 0 } }) return intGrid // All cells filled\r\n    else if (cell == null) return null\r\n\r\n    for (candidate in cell.candidates) {\r\n        intGrid[cell.row][cell.col] = candidate\r\n        val solution = solve(intGrid)\r\n        if (solution != null) return solution\r\n        intGrid[cell.row][cell.col] = 0 // Backtracking\r\n    }\r\n    return null // No solution found for this configuration\r\n}\r\n\r\n/**\r\n * Solves a Sudoku grid\r\n * @param stringGrid grid of number characters from `1` to `9` then `A` to `P` (for numbers from 10 to 25)\r\n * @sample `1 0 0 0\r\n * 0 0 2 0\r\n * 0 3 0 0\r\n * 0 0 0 4`\r\n */\r\nfun solveSudoku(stringGrid: String) {\r\n    val grid = stringGrid.toIntGrid()\r\n    println(\"Problem:\")\r\n    println(grid.toStringGrid())\r\n\r\n    val solution = solve(grid)\r\n    if (solution != null) {\r\n        println(\"Solution:\")\r\n        println(solution.toStringGrid())\r\n    }\r\n    else println(\"No solution\")\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Sudoku.kt b/src/Sudoku.kt
+--- a/src/Sudoku.kt	(revision e0e737b831737e6861f0fffcf320c58208c9ad14)
++++ b/src/Sudoku.kt	(date 1726531101611)
+@@ -1,3 +1,5 @@
++import java.util.TreeSet
++import java.util.stream.IntStream
+ import kotlin.math.sqrt
+ 
+ private val numbers = mapOf('A' to 10, 'B' to 11, 'C' to 12, 'D' to 13, 'E' to 14, 'F' to 15, 'G' to 16, 'H' to 17, 'I' to 18, 'J' to 19, 'K' to 20,
+@@ -38,13 +40,13 @@
+     val value = intGrid[r][c]
+     if (value != 0) return emptySet()
+ 
+-    val candidates = sortedSetOf<Int>()
+-    for (num in 1 .. intGrid.size) {
++    val candidates = LinkedHashSet<Int>()
++    IntStream.rangeClosed(1, intGrid.size).parallel().forEach { num ->
+         if (isValid(intGrid, r, c, num)) {
+             candidates.add(num)
+         }
+     }
+-    return candidates
++    return TreeSet(candidates)
+ }
+ 
+ private class Cell(intGrid: Array<out IntArray>, val row: Int, val col: Int) {
+@@ -74,10 +76,6 @@
+ /**
+  * Solves a Sudoku grid
+  * @param stringGrid grid of number characters from `1` to `9` then `A` to `P` (for numbers from 10 to 25)
+- * @sample `1 0 0 0
+- * 0 0 2 0
+- * 0 3 0 0
+- * 0 0 0 4`
+  */
+ fun solveSudoku(stringGrid: String) {
+     val grid = stringGrid.toIntGrid()
+Index: src/Main.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>fun main() {\r\n\r\n    val easiest = \"\"\"\r\n        1 0 0 0\r\n        0 0 2 0\r\n        0 3 0 0\r\n        0 0 0 4\r\n        \"\"\"\r\n    /*Solution:\r\n    1\t2\t4\t3\r\n    3\t4\t2\t1\r\n    4\t3\t1\t2\r\n    2\t1\t3\t4*/\r\n\r\n\r\n    val easy1 = \"\"\"\r\n        0 0 5 3 0 0 0 0 0\r\n        8 0 0 0 0 0 0 2 0\r\n        0 7 0 0 1 0 5 0 0 \r\n        4 0 0 0 0 5 3 0 0\r\n        0 1 0 0 7 0 0 0 6\r\n        0 0 3 2 0 0 0 8 0\r\n        0 6 0 5 0 0 0 0 9\r\n        0 0 4 0 0 0 0 3 0\r\n        0 0 0 0 0 9 7 0 0\r\n        \"\"\"\r\n    /*Solution:\r\n    1\t4\t5\t3\t2\t7\t6\t9\t8\r\n    8\t3\t9\t6\t5\t4\t1\t2\t7\r\n    6\t7\t2\t9\t1\t8\t5\t4\t3\r\n    4\t9\t6\t1\t8\t5\t3\t7\t2\r\n    2\t1\t8\t4\t7\t3\t9\t5\t6\r\n    7\t5\t3\t2\t9\t6\t4\t8\t1\r\n    3\t6\t7\t5\t4\t2\t8\t1\t9\r\n    9\t8\t4\t7\t6\t1\t2\t3\t5\r\n    5\t2\t1\t8\t3\t9\t7\t6\t4*/\r\n\r\n    val easy2 = \"\"\"\r\n        1 3 0 C 0 0 A 0 0 D F B 7 0 0 0\r\n        0 0 F D G 0 0 4 0 A E 7 2 1 0 8\r\n        G 0 0 0 9 0 5 D 3 0 0 0 A F B E\r\n        0 E 4 A B 0 0 0 5 0 1 G 0 3 0 D\r\n        0 F 1 0 3 0 9 0 D 8 5 0 E 0 G 7\r\n        0 8 0 0 E 5 1 0 0 C B 0 0 0 3 F\r\n        E A G 0 0 D 6 0 0 1 0 F 0 0 C 0\r\n        7 0 3 9 F 0 0 0 0 0 G 0 0 B D 0\r\n        0 D 0 1 0 7 B 0 0 G 0 0 3 0 F 4\r\n        0 7 0 0 0 0 0 5 C 0 0 0 D 0 E 0\r\n        0 0 0 6 1 0 2 E F 3 D 0 0 7 0 0\r\n        F 0 0 0 4 8 D 3 0 0 0 A 9 0 0 0\r\n        0 1 2 3 8 A 0 0 6 F 0 0 0 C 0 0\r\n        0 9 0 7 2 6 3 1 0 0 0 0 F E 0 A\r\n        6 5 8 0 D C 0 0 E 7 0 0 0 0 0 0\r\n        A C E 0 0 B G 0 0 4 2 0 0 D 7 3\r\n        \"\"\"\r\n    /*Solution:\r\n    1\t3\t9\tC\t6\tE\tA\t2\t8\tD\tF\tB\t7\t4\t5\tG\r\n    5\tB\tF\tD\tG\t3\tC\t4\t9\tA\tE\t7\t2\t1\t6\t8\r\n    G\t6\t7\t8\t9\t1\t5\tD\t3\t2\t4\tC\tA\tF\tB\tE\r\n    2\tE\t4\tA\tB\tF\t7\t8\t5\t6\t1\tG\tC\t3\t9\tD\r\n    C\tF\t1\tB\t3\t4\t9\tA\tD\t8\t5\t2\tE\t6\tG\t7\r\n    D\t8\t6\t2\tE\t5\t1\tG\t7\tC\tB\t9\t4\tA\t3\tF\r\n    E\tA\tG\t5\t7\tD\t6\tB\t4\t1\t3\tF\t8\t2\tC\t9\r\n    7\t4\t3\t9\tF\t2\t8\tC\tA\tE\tG\t6\t5\tB\tD\t1\r\n    9\tD\tA\t1\tC\t7\tB\t6\t2\tG\t8\tE\t3\t5\tF\t4\r\n    3\t7\tB\t4\tA\tG\tF\t5\tC\t9\t6\t1\tD\t8\tE\t2\r\n    8\tG\t5\t6\t1\t9\t2\tE\tF\t3\tD\t4\tB\t7\tA\tC\r\n    F\t2\tC\tE\t4\t8\tD\t3\tB\t5\t7\tA\t9\tG\t1\t6\r\n    B\t1\t2\t3\t8\tA\tE\t7\t6\tF\t9\tD\tG\tC\t4\t5\r\n    4\t9\tD\t7\t2\t6\t3\t1\tG\tB\tC\t5\tF\tE\t8\tA\r\n    6\t5\t8\tG\tD\tC\t4\tF\tE\t7\tA\t3\t1\t9\t2\tB\r\n    A\tC\tE\tF\t5\tB\tG\t9\t1\t4\t2\t8\t6\tD\t7\t3*/\r\n\r\n\r\n    val medium1 = \"\"\"\r\n        8 5 0 0 0 2 4 0 0 \r\n        7 2 0 0 0 0 0 0 9 \r\n        0 0 4 0 0 0 0 0 0 \r\n        0 0 0 1 0 7 0 0 2 \r\n        3 0 5 0 0 0 9 0 0 \r\n        0 4 0 0 0 0 0 0 0 \r\n        0 0 0 0 8 0 0 7 0 \r\n        0 1 7 0 0 0 0 0 0 \r\n        0 0 0 0 3 6 0 4 0 \r\n        \"\"\"\r\n    /*Solution:\r\n    8\t5\t9\t6\t1\t2\t4\t3\t7\r\n    7\t2\t3\t8\t5\t4\t1\t6\t9\r\n    1\t6\t4\t3\t7\t9\t5\t2\t8\r\n    9\t8\t6\t1\t4\t7\t3\t5\t2\r\n    3\t7\t5\t2\t6\t8\t9\t1\t4\r\n    2\t4\t1\t5\t9\t3\t7\t8\t6\r\n    4\t3\t2\t9\t8\t1\t6\t7\t5\r\n    6\t1\t7\t4\t2\t5\t8\t9\t3\r\n    5\t9\t8\t7\t3\t6\t2\t4\t1*/\r\n\r\n    val medium2 = \"\"\"\r\n        8 0 0 0 0 0 0 0 0 \r\n        0 0 3 6 0 0 0 0 0 \r\n        0 7 0 0 9 0 2 0 0\r\n        0 5 0 0 0 7 0 0 0 \r\n        0 0 0 0 4 5 7 0 0 \r\n        0 0 0 1 0 0 0 3 0 \r\n        0 0 1 0 0 0 0 6 8\r\n        0 0 8 5 0 0 0 1 0 \r\n        0 9 0 0 0 0 4 0 0 \r\n        \"\"\"\r\n    /*Solution:\r\n    8\t1\t2\t7\t5\t3\t6\t4\t9\r\n    9\t4\t3\t6\t8\t2\t1\t7\t5\r\n    6\t7\t5\t4\t9\t1\t2\t8\t3\r\n    1\t5\t4\t2\t3\t7\t8\t9\t6\r\n    3\t6\t9\t8\t4\t5\t7\t2\t1\r\n    2\t8\t7\t1\t6\t9\t5\t3\t4\r\n    5\t2\t1\t9\t7\t4\t3\t6\t8\r\n    4\t3\t8\t5\t2\t6\t9\t1\t7\r\n    7\t9\t6\t3\t1\t8\t4\t5\t2*/\r\n\r\n    val medium3 = \"\"\"\r\n        8 5 0 0 0 2 4 0 0\r\n        7 2 0 0 0 0 0 0 9\r\n        0 0 4 0 0 0 0 0 0 \r\n        0 0 0 1 0 7 0 0 2\r\n        3 0 5 0 0 0 9 0 0 \r\n        0 4 0 0 0 0 0 0 0\r\n        0 0 0 0 8 0 0 7 0\r\n        0 1 7 0 0 0 0 0 0 \r\n        0 0 0 0 3 6 0 4 0\r\n        \"\"\"\r\n    /*Solution:\r\n    8\t5\t9\t6\t1\t2\t4\t3\t7\r\n    7\t2\t3\t8\t5\t4\t1\t6\t9\r\n    1\t6\t4\t3\t7\t9\t5\t2\t8\r\n    9\t8\t6\t1\t4\t7\t3\t5\t2\r\n    3\t7\t5\t2\t6\t8\t9\t1\t4\r\n    2\t4\t1\t5\t9\t3\t7\t8\t6\r\n    4\t3\t2\t9\t8\t1\t6\t7\t5\r\n    6\t1\t7\t4\t2\t5\t8\t9\t3\r\n    5\t9\t8\t7\t3\t6\t2\t4\t1*/\r\n\r\n\r\n    val hardest = \"\"\"\r\n        0 0 0 0 0 6 0 0 0 \r\n        0 5 9 0 0 0 0 0 8 \r\n        2 0 0 0 0 8 0 0 0 \r\n        0 4 5 0 0 0 0 0 0 \r\n        0 0 3 0 0 0 0 0 0 \r\n        0 0 6 0 0 3 0 5 4 \r\n        0 0 0 3 2 5 0 0 6 \r\n        0 0 0 0 0 0 0 0 0 \r\n        0 0 0 0 0 0 0 0 0 \r\n        \"\"\"\r\n    /*Solution:\r\n    4\t3\t8\t7\t9\t6\t2\t1\t5\r\n    6\t5\t9\t1\t3\t2\t4\t7\t8\r\n    2\t7\t1\t4\t5\t8\t6\t9\t3\r\n    8\t4\t5\t2\t1\t9\t3\t6\t7\r\n    7\t1\t3\t5\t6\t4\t8\t2\t9\r\n    9\t2\t6\t8\t7\t3\t1\t5\t4\r\n    1\t9\t4\t3\t2\t5\t7\t8\t6\r\n    3\t6\t2\t9\t8\t7\t5\t4\t1\r\n    5\t8\t7\t6\t4\t1\t9\t3\t2*/\r\n\r\n    executionTime {\r\n        solveSudoku(easiest)\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Main.kt b/src/Main.kt
+--- a/src/Main.kt	(revision e0e737b831737e6861f0fffcf320c58208c9ad14)
++++ b/src/Main.kt	(date 1726529986669)
+@@ -150,18 +150,8 @@
+         0 0 0 0 0 0 0 0 0 
+         0 0 0 0 0 0 0 0 0 
+         """
+-    /*Solution:
+-    4	3	8	7	9	6	2	1	5
+-    6	5	9	1	3	2	4	7	8
+-    2	7	1	4	5	8	6	9	3
+-    8	4	5	2	1	9	3	6	7
+-    7	1	3	5	6	4	8	2	9
+-    9	2	6	8	7	3	1	5	4
+-    1	9	4	3	2	5	7	8	6
+-    3	6	2	9	8	7	5	4	1
+-    5	8	7	6	4	1	9	3	2*/
+ 
+     executionTime {
+-        solveSudoku(easiest)
++        solveSudoku(hardest)
+     }
+ }
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"e8a2484f-5303-49af-805b-c9712e234dcc\" name=\"Changes\" comment=\"1.1.0\">\r\n      <change afterPath=\"$PROJECT_DIR$/src/Utils.kt\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/Main.kt\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/Main.kt\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Kotlin Data Class\" />\r\n        <option value=\"Kotlin Class\" />\r\n        <option value=\"Kotlin Object\" />\r\n        <option value=\"Kotlin File\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 5\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2m6VvjxxtCBHaXnxMZR4NRc7jF5\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"Kotlin.MainKt.executor\": \"Run\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"git-widget-placeholder\": \"master\",\r\n    \"ignore.virus.scanning.warn.message\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"MainKt\" type=\"JetRunConfigurationType\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"MainKt\" />\r\n      <module name=\"SudokuSolver\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Kotlin.MainKt\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-jdk-9823dce3aa75-b114ca120d71-intellij.indexing.shared.core-IU-242.21829.142\" />\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-IU-242.21829.142\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"e8a2484f-5303-49af-805b-c9712e234dcc\" name=\"Changes\" comment=\"\" />\r\n      <created>1726397246458</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1726397246458</updated>\r\n      <workItem from=\"1726397247568\" duration=\"220000\" />\r\n      <workItem from=\"1726397477695\" duration=\"51715000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"Init the grid with heuristic values.\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1726410952836</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1726410952836</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"Init the grid with heuristic values.\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1726414056100</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1726414056100</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"1.0.2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1726470929949</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1726470929949</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"1.1.0\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1726504723156</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1726504723156</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"5\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT\" value=\"false\" />\r\n    <option name=\"CHECK_NEW_TODO\" value=\"false\" />\r\n    <MESSAGE value=\"Init the grid with heuristic values.\" />\r\n    <MESSAGE value=\"1.0.2\" />\r\n    <MESSAGE value=\"1.1.0\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"1.1.0\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision e0e737b831737e6861f0fffcf320c58208c9ad14)
++++ b/.idea/workspace.xml	(date 1726530290469)
+@@ -5,9 +5,9 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="e8a2484f-5303-49af-805b-c9712e234dcc" name="Changes" comment="1.1.0">
+-      <change afterPath="$PROJECT_DIR$/src/Utils.kt" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.kt" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/Sudoku.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Sudoku.kt" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -36,21 +36,21 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "Kotlin.MainKt.executor": "Run",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "git-widget-placeholder": "master",
+-    "ignore.virus.scanning.warn.message": "true",
+-    "kotlin-language-version-configured": "true",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;Kotlin.MainKt.executor&quot;: &quot;Run&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
++    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RunManager">
+     <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+       <option name="MAIN_CLASS_NAME" value="MainKt" />
+@@ -61,6 +61,7 @@
+     </configuration>
+     <recent_temporary>
+       <list>
++        <item itemvalue="Kotlin.MainKt" />
+         <item itemvalue="Kotlin.MainKt" />
+       </list>
+     </recent_temporary>
