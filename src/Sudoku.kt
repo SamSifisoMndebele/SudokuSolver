@@ -30,7 +30,7 @@ fun Array<out IntArray>.toStringGrid(): String {
     for ((i, rows) in this.withIndex()) {
         if (i > 0) buffer.append('\n')
         for ((j, element) in rows.withIndex()) {
-            if (j > 0) buffer.append("\t")
+            if (j > 0) buffer.append(" ")
             if (element < 10) buffer.append(element) else buffer.append('A' + element - 10)
         }
     }
