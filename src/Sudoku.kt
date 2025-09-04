@@ -14,7 +14,7 @@ private val numbers = mapOf('A' to 10, 'B' to 11, 'C' to 12, 'D' to 13, 'E' to 1
  * Characters 'A'-'Z' are converted to integers 10-36.
  * @return A 2D integer array representing the Sudoku grid.
  */
-private fun String.toIntGrid(): Array<out IntArray> = replace(Regex("[ \t\r]"), "")
+fun String.toIntGrid(): Array<out IntArray> = trimIndent().replace(Regex("[ \t\r]"), "")
     .replace(Regex("\n+"), "\n").trim()
     .split('\n')
     .map { it.toCharArray().map { char -> if (char.isDigit()) char.digitToInt() else numbers[char]!! }.toIntArray() }
@@ -25,7 +25,7 @@ private fun String.toIntGrid(): Array<out IntArray> = replace(Regex("[ \t\r]"), 
  * Numbers less than 10 are represented as digits, while numbers 10 and greater are represented by characters 'A' onwards.
  * @return A string representation of the Sudoku grid.
  */
-private fun Array<out IntArray>.toStringGrid(): String {
+fun Array<out IntArray>.toStringGrid(): String {
     val buffer = StringBuilder()
     for ((i, rows) in this.withIndex()) {
         if (i > 0) buffer.append('\n')
@@ -161,7 +161,7 @@ private fun nextPositionParallel(grid: Array<out IntArray>): Position {
  * @param grid The Sudoku grid to solve.
  * @return The solved Sudoku grid as a 2D integer array, or `null` if no solution is found.
  */
-private fun solve(grid: Array<out IntArray>): Array<out IntArray>? {
+fun solve(grid: Array<out IntArray>): Array<out IntArray>? {
     val pos = nextPosition(grid)
     if (pos == Position()) { return grid }  // All cells filled
 
@@ -179,7 +179,7 @@ private fun solve(grid: Array<out IntArray>): Array<out IntArray>? {
  * @param grid The Sudoku grid to solve.
  * @return The solved Sudoku grid as a 2D integer array, or `null` if no solution is found.
  */
-private fun solveParallel(grid: Array<out IntArray>): Array<out IntArray>? {
+fun solveParallel(grid: Array<out IntArray>): Array<out IntArray>? {
     val pos = nextPositionParallel(grid)
     if (pos == Position()) { return grid }  // All cells filled
 
