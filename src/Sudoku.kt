@@ -211,6 +211,5 @@ fun String.sudokuSolve(parallel: Boolean = true): Array<out IntArray>? {
         println(solution.toStringGrid())
     }
     else println("No solution")
-    println("------------------------------------------------------")
     return solution
 }
