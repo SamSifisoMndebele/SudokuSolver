@@ -3,7 +3,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class SudokuTest {
-    val parallel = true
+    val parallel = false
 
     @Test
     fun testEasiest() {
